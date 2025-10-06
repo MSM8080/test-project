@@ -86,6 +86,7 @@ void LoginPage::prompt()
         std::cout << "\033[1;35mEnter your user name: \033[1;32m$\033[1;34m~: \033[0m"; // $~: in GREEN &
         std::getline(std::cin, _input);
 
+
         // if i want to exit
         if (_input[0] == 'e')
         {
@@ -107,7 +108,7 @@ void LoginPage::prompt()
         // not exist
         else 
         {
-            std::cout << "\033[1;31mWrong user name !!\033[0m" << std::endl;
+            std::cout << "Wrong user name" << std::endl;
         }
     }
 
@@ -127,10 +128,7 @@ void LoginPage::prompt()
             return;
         }
 
-        // login by passwd
-        _login->login_passwd(_input);
-
-        // check [passwd is coreect
+        // check name exist
         // exist
         if (_login->is_passwd_correct()) 
         {
@@ -140,8 +138,7 @@ void LoginPage::prompt()
         // not exist
         else 
         {
-            std::cout << "\033[1;31mWrong password !!\033[0m" << std::endl;
-            std::cout << std::flush;
+            std::cout << "Wrong user name" << std::endl;
         }
     }
 
@@ -167,15 +164,15 @@ MainPage::~MainPage() {}
 void MainPage::print_page()
 {
     std::cout << std::endl;
-    std::cout << "\033[1;36m ## Masary services: \n\n "; // in cyan
+    std::cout << "\033[1;36m ## Masary services: \n\n \033[0m"; // in cyan
 
     std::cout << "\033[1;33m   (1) Change PIN\n \033[0m";                // in YELLOW
     std::cout << "\033[1;33m   (2) Withdrawal money\n \033[0m";          // in YELLOW
     std::cout << "\033[1;33m   (3) Deposit money\n \033[0m";             // in YELLOW
-    std::cout << "\033[1;33m   (4) Transfer money \033[0m      \033[1;36m{Available soon}\n \033[0m";            // in YELLOW
-    std::cout << "\033[1;33m   (5) Pay bills \033[0m           \033[1;36m{Available soon}\n \033[0m";                 // in YELLOW
+    std::cout << "\033[1;33m   (4) Transfer money\n \033[0m";            // in YELLOW
+    std::cout << "\033[1;33m   (5) Pay bills\n \033[0m";                 // in YELLOW
     std::cout << "\033[1;33m   (6) Wallet balance\n \033[0m";            // in YELLOW
-    std::cout << "\033[1;33m   (7) Transiction history \033[0m \033[1;36m{Available soon}\n \033[0m"; // in YELLOW
+    std::cout << "\033[1;33m   (7) Check transiction history\n \033[0m"; // in YELLOW
 
     std::cout << "\033[1;31m   (q) Quit\n \033[0m"; // in RED
     std::cout << "\033[1;31m   (e) Exit\n \033[0m"; // in RED
@@ -185,10 +182,6 @@ void MainPage::print_page()
 // -------------------------------------------------------------------
 void MainPage::prompt()
 {
-
-    // acces on current repo & user
-    UserRepo* current_repo = _app->get_current_repo();
-    User* current_user = _app->get_currrent_user();
 
     // login with correct user name
     while (1)
@@ -200,18 +193,12 @@ void MainPage::prompt()
         // want to exit
         if (_input[0] == 'e')
         {
-            // update users repo by new info about current user
-            current_repo->update_user_data(*current_user);
-            // end program
             _next_page = nullptr;
             break;
         }
         // want to back
         if (_input[0] == 'q')
         {
-            // update users repo by new info about current user
-            current_repo->update_user_data(*current_user);
-            // logout
             std::unique_ptr<Page> temp = std::make_unique<LoginPage>(_app);
             _next_page = std::move(temp);
             break;
@@ -277,9 +264,6 @@ void WithdrawalPage::print_page()
 // -------------------------------------------------------------------
 void WithdrawalPage::prompt()
 {
-    // access user
-    User* current_user = _app->get_currrent_user();
-
     // enter amount of money fo withdrawal
     while (1)
     {
@@ -295,28 +279,20 @@ void WithdrawalPage::prompt()
             break;
         }
 
-        
-        // check input is only numbers
-        bool is_just_numbers = std::all_of(_input.begin(), _input.end(), ::isdigit);
-        if (!is_just_numbers)
+        // some check on _input here is (correct,wrong)
+
+        // assume correct input //
+        if (1)
         {
-            std::cout << "\033[1;31mInvalid number !!\033[0m" << std::endl;
-            continue;
+            // make it integer
+            _amount = atoi(_input.c_str());
         }
 
-        // check if it within balance of current user
-        _amount = std::stod(_input);
-        if(_amount > current_user->get_balance())
-        {
-            std::cout << "\033[1;31mNot enough balance !!\033[0m" << std::endl;
-            continue;
-        }
+        // some checks on user balance here //
 
         // decrease user balance here and //
-        current_user->decrease_balance(_amount);
 
-        // print new balance
-        printf("\033[1;35mYour new balance: \033[1;33m%lf$\n\033[0m",current_user->get_balance()); // in magemta & yellow
+        // print the new balance //
     }
     return;
 }
@@ -341,9 +317,6 @@ void DepositPage::print_page()
 // -------------------------------------------------------------------
 void DepositPage::prompt()
 {
-    // access user
-    User* current_user = _app->get_currrent_user();
-
     // enter amount of money fo withdrawal
     while (1)
     {
@@ -359,21 +332,20 @@ void DepositPage::prompt()
             break;
         }
 
-        
-        // check input is only numbers
-        bool is_just_numbers = std::all_of(_input.begin(), _input.end(), ::isdigit);
-        if (!is_just_numbers)
+        // some check on _input here is (correct,wrong)
+
+        // assume correct input //
+        if (1)
         {
-            std::cout << "\033[1;31mInvalid number !!\033[0m" << std::endl;
-            continue;
+            // make it integer
+            _amount = atoi(_input.c_str());
         }
 
-        // increase user balance
-        _amount = std::stod(_input);
-        current_user->increase_balance(_amount);
+        // some checks on user balance here //
 
-        // print new balance
-        printf("\033[1;35mYour new balance: \033[1;33m%lf$\n\033[0m",current_user->get_balance()); // in magemta & yellow
+        // decrease user balance here and //
+
+        // print the new balance //
     }
     return;
 }
@@ -442,10 +414,12 @@ void TransferPage::prompt()
 // #####################################################################################################################
 // -------------------------------------------------------------------
 ChangePINPage::ChangePINPage(App* app) : Page(app)
-{}
+{
+}
 // -------------------------------------------------------------------
 ChangePINPage::~ChangePINPage()
-{}
+{
+}
 // -------------------------------------------------------------------
 void ChangePINPage::print_page()
 {
@@ -455,10 +429,7 @@ void ChangePINPage::print_page()
     std::cout << std::endl;
 }
 void ChangePINPage::prompt()
-{    
-    // access user
-    User* current_user = _app->get_currrent_user();
-
+{
     // enter new passwd
     while (1)
     {
@@ -494,8 +465,9 @@ void ChangePINPage::prompt()
         }
         else
         {
-            current_user->set_passwd(_new_passwd);
             std::cout << "\033[1;32mPassword changed\n\r\033[0m"; // in GREEN
+
+            // step for storing new passwd {here} //
         }
     }
     return;
@@ -515,35 +487,31 @@ void WalletBalancePage::print_page()
 {
     std::cout << std::endl;
     std::cout << "\033[1;36m ## Wallet Balance: \n\n \033[0m"; // in cyan
-    std::cout << "\033[1;33m   (s) show balance\n \033[0m";  // in YELLOW
     std::cout << "\033[1;31m   (b) back\n \033[0m";           // in RED
     std::cout << std::endl;
 }
 // -------------------------------------------------------------------
 void WalletBalancePage::prompt()
 {
-    // access user
-    User* current_user = _app->get_currrent_user();
-
-    // print first time
-    printf("\033[1;35mYour new balance: \033[1;33m%lf$\n\033[0m",current_user->get_balance()); // in magemta & yellow
+    // get balance stored from user
+    _balance = "4000";
+    s = _balance.c_str();
     
+        // enter new passwd
     while (1)
     {
+        // print balance 
+        printf("\033[1;35mYour Balance: \033[1;33m%s$\n\033[0m",s); // in magemta & yellow
         // take input
-        std::cout << "\033[1;35mEnter your option: \033[1;32m$\033[1;34m~: \033[0m"; // $~: in GREEN &
+        std::cout << "\033[1;35mEnter new password: \033[1;32m$\033[1;34m~: \033[0m"; // $~: in GREEN &
         std::getline(std::cin, _input);
 
         // if i want to back , {assume no for now} //
-        if(_input[0] == 'b')
+        if (_input[0] == 'b')
         {
             std::unique_ptr<Page> temp = std::make_unique<MainPage>(_app);
             _next_page = std::move(temp);
             break;
-        }
-        else if(_input[0] == 's')
-        {
-            printf("\033[1;35mYour new balance: \033[1;33m%lf$\n\033[0m",current_user->get_balance()); // in magemta & yellow
         }
     }
     return;

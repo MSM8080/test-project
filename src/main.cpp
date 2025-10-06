@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+
 #include "../include/navigator.h"
 #include "../include/pages.h"
 #include "../include/utilities.h"
@@ -20,8 +21,8 @@ int main()
 {
     App app(users_path, transictions_path);
     app.run();
-    app.save_app_data();
 
+    
     return 0;
 }
 
